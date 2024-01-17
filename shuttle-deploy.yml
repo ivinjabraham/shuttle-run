@@ -1,0 +1,40 @@
+name: Shuttle Deploy
+description: (Re)Deploys a shuttle project.
+
+inputs:
+  deploy-key:
+    description: 'API key found at "https://www.shuttle.rs/login"'.
+    required: true
+  cargo-shuttle-version:
+    description: "Version of cargo-shuttle"
+    required: false
+    default: ""
+  name:
+    description: "Name of the project (overrides Shuttle.toml and crate name)"
+    required: false
+    default: ""
+  secrets:
+    description: "Contents of `Secrets.toml` file."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Install binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install cargo-shuttle
+        if: ${{ inputs.cargo-shuttle-version == '' }}
+        run: cargo binstall -y --locked cargo-shuttle
+        shell: bash
+
+      - name: Install cargo-shuttle ${{ inputs.cargo-shuttle-version }}
+        if: ${{ inputs.cargo-shuttle-version != '' }}
+        run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
+        shell: bash
