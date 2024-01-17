@@ -1,9 +1,9 @@
 name: Shuttle Deploy
-description: (Re)Deploys a shuttle project.
+description: "(Re)Deploys a shuttle project."
 
 inputs:
   deploy-key:
-    description: 'API key found at "https://www.shuttle.rs/login"'.
+    description: 'API key found at "https://www.shuttle.rs/login"'
     required: true
   cargo-shuttle-version:
     description: "Version of cargo-shuttle"
@@ -21,20 +21,20 @@ inputs:
 runs:
   using: "composite"
 
-    steps:
+  steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
+    - name: Checkout
+      uses: actions/checkout@v4.1.1
 
-      - name: Install binstall
-        uses: cargo-bins/cargo-binstall@main
+    - name: Install binstall
+      uses: cargo-bins/cargo-binstall@main
 
-      - name: Install cargo-shuttle
-        if: ${{ inputs.cargo-shuttle-version == '' }}
-        run: cargo binstall -y --locked cargo-shuttle
-        shell: bash
+    - name: Install cargo-shuttle
+      if: ${{ inputs.cargo-shuttle-version == '' }}
+      run: cargo binstall -y --locked cargo-shuttle
+      shell: bash
 
-      - name: Install cargo-shuttle ${{ inputs.cargo-shuttle-version }}
-        if: ${{ inputs.cargo-shuttle-version != '' }}
-        run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
-        shell: bash
+    - name: Install cargo-shuttle ${{ inputs.cargo-shuttle-version }}
+      if: ${{ inputs.cargo-shuttle-version != '' }}
+      run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
+      shell: bash
