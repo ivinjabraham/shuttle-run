@@ -21,6 +21,9 @@ inputs:
 runs:
   using: "composite"
 
+  env:
+    SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
+
   steps:
 
     - name: Checkout
@@ -45,6 +48,10 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
 
+    - name: Shuttle Login
+      run: cargo shuttle login --api-key $SHUTTLE_API_KEY
+      shell: bash
+
     - name: Stop project
       run: cargo shuttle project stop
       shell: bash
@@ -58,6 +65,4 @@ runs:
         cargo shuttle deploy \
         $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
       working-directory: ${{ inputs.working-directory }}
-      env:
-        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
       shell: bash
