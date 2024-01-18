@@ -47,9 +47,11 @@ runs:
 
     - name: Stop project
       run: cargo shuttle project stop
+      shell: bash
 
     - name: Start project
       run: cargo shuttle project start --idle-minutes 0
+      shell: bash
 
     - name: Deploy project
       run: |
