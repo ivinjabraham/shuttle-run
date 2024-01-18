@@ -38,3 +38,24 @@ runs:
       if: ${{ inputs.cargo-shuttle-version != '' }}
       run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
       shell: bash
+    
+    - name: Create secrets.toml
+      if: ${{ inputs.secrets != '' }}
+      run: echo "${{ inputs.secrets }}" > Secrets.toml
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+
+    - name: Stop project
+      run: cargo shuttle project stop
+
+    - name: Start project
+      run: cargo shuttle project start --idle-minutes 0
+
+    - name: Deploy project
+      run: |
+        cargo shuttle deploy \
+        $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
+      shell: bash
