@@ -21,8 +21,6 @@ inputs:
 runs:
   using: "composite"
 
-  env:
-    SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
 
   steps:
 
@@ -49,6 +47,8 @@ runs:
       shell: bash
 
     - name: Shuttle Login
+      env:
+        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
       run: cargo shuttle login --api-key $SHUTTLE_API_KEY
       shell: bash
 
@@ -65,4 +65,6 @@ runs:
         cargo shuttle deploy \
         $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
       working-directory: ${{ inputs.working-directory }}
+      env:
+        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
       shell: bash
