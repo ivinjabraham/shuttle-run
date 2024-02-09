@@ -17,10 +17,13 @@ inputs:
     description: "Contents of `Secrets.toml` file."
     required: false
     default: ""
+  enable-debug-logging:
+    description: "Sets RUST_LOG=CARGO_SHUTTLE when deploying"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
-
 
   steps:
 
@@ -52,15 +55,22 @@ runs:
       run: cargo shuttle login --api-key $SHUTTLE_API_KEY
       shell: bash
 
-    - name: Stop project
-      run: cargo shuttle project stop
-      shell: bash
-
-    - name: Start project
-      run: cargo shuttle project start --idle-minutes 0
+    - name: Restart project
+      run: cargo shuttle project restart
       shell: bash
 
     - name: Deploy project
+      if: ${{ inputs.enable-debug-logging != ''}}
+      run: |
+        RUST_LOG=cargo_shuttle cargo shuttle deploy \
+        $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
+      shell: bash
+
+    - name: Deploy project
+      if: ${{ inputs.enable-debug-logging == ''}}
       run: |
         cargo shuttle deploy \
         $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
