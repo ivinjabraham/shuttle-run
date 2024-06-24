@@ -1,4 +1,4 @@
-# Shuttle Deploy Workflow
+# Shuttle Run Workflow
 
 This initially started out as a replacement to the official [shuttle-hq/deploy-action](https://github.com/shuttle-hq/deploy-action) as `cargo shuttle deploy` used to fail if the deployment was already running.
 
