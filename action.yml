@@ -1,24 +1,13 @@
-name: Shuttle Deploy
-description: "(Re)Deploys a shuttle project."
+name: Shuttle Run
+description: "Runs a shuttle project."
 
 inputs:
-  deploy-key:
-    description: 'API key found at "https://www.shuttle.rs/login"'
-    required: true
   cargo-shuttle-version:
-    description: "Version of cargo-shuttle"
-    required: false
-    default: ""
-  name:
-    description: "Name of the project (overrides Shuttle.toml and crate name)"
+    description: "Use a specific version of Shuttle."
     required: false
     default: ""
   secrets:
     description: "Contents of `Secrets.toml` file."
-    required: false
-    default: ""
-  enable-debug-logging:
-    description: "Sets RUST_LOG=CARGO_SHUTTLE when deploying"
     required: false
     default: ""
 
@@ -26,51 +15,26 @@ runs:
   using: "composite"
 
   steps:
-    - name: Install binstall
+    - name: Install binstall.
       uses: cargo-bins/cargo-binstall@main
 
-    - name: Install cargo-shuttle
+      
+    - name: Install cargo-shuttle.
       if: ${{ inputs.cargo-shuttle-version == '' }}
       run: cargo binstall -y --locked cargo-shuttle
       shell: bash
 
-    - name: Install cargo-shuttle ${{ inputs.cargo-shuttle-version }}
+    - name: Install cargo-shuttle with specific version.
       if: ${{ inputs.cargo-shuttle-version != '' }}
       run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
       shell: bash
     
-    - name: Create secrets.toml
+
+    - name: Create secrets.toml.
       if: ${{ inputs.secrets != '' }}
       run: echo "${{ inputs.secrets }}" > Secrets.toml
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
 
-    - name: Shuttle Login
-      env:
-        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
-      run: cargo shuttle login --api-key $SHUTTLE_API_KEY
-      shell: bash
-
-    - name: Restart project
-      run: cargo shuttle project restart
-      shell: bash
-
-    - name: Deploy project
-      if: ${{ inputs.enable-debug-logging != ''}}
-      run: |
-        RUST_LOG=cargo_shuttle cargo shuttle deploy \
-        $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
-      working-directory: ${{ inputs.working-directory }}
-      env:
-        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
-      shell: bash
-
-    - name: Deploy project
-      if: ${{ inputs.enable-debug-logging == ''}}
-      run: |
-        cargo shuttle deploy \
-        $(if [ "${{ inputs.name }}" != "" ]; then echo "--name ${{ inputs.name }}"; fi)
-      working-directory: ${{ inputs.working-directory }}
-      env:
-        SHUTTLE_API_KEY: ${{ inputs.deploy-key }}
+    - name: Run project.
+      run: cargo shuttle run
       shell: bash
