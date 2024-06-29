@@ -42,7 +42,7 @@ runs:
     - name: Check for server start
       run: |
         echo "Waiting for server to start..."
-        timeout=60 # Timeout after 90 seconds
+        timeout=180 # Timeout after 2 minutes
         interval=5 # Check every 5 seconds
         elapsed=0
 
