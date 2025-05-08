@@ -1,5 +1,5 @@
 name: Shuttle Run
-description: "Runs a shuttle project."
+description: "Locally runs and checks if a Shuttle project starts up properly."
 
 inputs:
   cargo-shuttle-version:
@@ -10,6 +10,10 @@ inputs:
     description: "Contents of `Secrets.toml` file."
     required: false
     default: ""
+  timeout:
+    description: "Amount of time that needs to pass before it stops checking for a successful start."
+    required: false
+    default: '180'
 
 runs:
   using: "composite"
@@ -17,7 +21,6 @@ runs:
   steps:
     - name: Install binstall.
       uses: cargo-bins/cargo-binstall@main
-
       
     - name: Install cargo-shuttle.
       if: ${{ inputs.cargo-shuttle-version == '' }}
@@ -29,7 +32,6 @@ runs:
       run: cargo binstall -y --locked cargo-shuttle@${{ inputs.cargo-shuttle-version }}
       shell: bash
     
-
     - name: Create secrets.toml.
       if: ${{ inputs.secrets != '' }}
       run: echo "${{ inputs.secrets }}" > Secrets.toml
@@ -39,11 +41,11 @@ runs:
       run: cargo shuttle run &
       shell: bash
 
-    - name: Check for server start
+    - name: Check for server start.
       run: |
         echo "Waiting for server to start..."
-        timeout=180 # Timeout after 2 minutes
-        interval=5 # Check every 5 seconds
+        timeout=${{ inputs.timeout }}
+        interval=5
         elapsed=0
 
         while ! curl --silent --fail localhost:8000; do
