@@ -1,6 +1,10 @@
 name: Shuttle Run
 description: "Locally runs and checks if a Shuttle project starts up properly."
 
+branding:
+  icon: 'activity'
+  color: 'orange'
+
 inputs:
   cargo-shuttle-version:
     description: "Use a specific version of Shuttle."
