@@ -14,6 +14,14 @@ inputs:
     description: "Amount of time that needs to pass before it stops checking for a successful start."
     required: false
     default: '180'
+  port:
+    description: "Port on which the server will run."
+    required: false
+    default: '8000'
+  health-path:
+    description: "Path to check for server health (e.g., /health)."
+    required: false
+    default: '/'
 
 runs:
   using: "composite"
@@ -38,7 +46,7 @@ runs:
       shell: bash
 
     - name: Run project.
-      run: cargo shuttle run &
+      run: cargo shuttle run --port ${{ inputs.port }}
       shell: bash
 
     - name: Check for server start.
@@ -47,8 +55,9 @@ runs:
         timeout=${{ inputs.timeout }}
         interval=5
         elapsed=0
-
-        while ! curl --silent --fail localhost:8000; do
+        port=${{ inputs.port }}
+        health_path=${{ inputs.health-path }}
+        while ! curl --silent --fail localhost:${port}${health_path}; do
           sleep $interval
           elapsed=$((elapsed + interval))
           if [ $elapsed -ge $timeout ]; then
